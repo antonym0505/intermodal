@@ -1,0 +1,31 @@
+{
+  "name": "intermodal",
+  "version": "1.0.0",
+  "description": "Intermodal Unit Tracking POC - Decentralized container custody tracking",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.ts --network hardhat",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network baseSepolia"
+  },
+  "keywords": [
+    "blockchain",
+    "nft",
+    "shipping",
+    "containers",
+    "logistics"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "hardhat": "^2.22.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.0.0"
+  }
+}

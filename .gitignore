@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+cache/
+artifacts/
+typechain-types/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+coverage.json
+
+# Hardhat
+deployments/
