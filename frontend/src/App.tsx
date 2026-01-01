@@ -4,6 +4,7 @@ import { api, type Container, type HandoffStatus, type CustodyEvent } from './ap
 import { ContainerCard } from './components/ContainerCard';
 import { HandoffStatusCard } from './components/HandoffStatusCard';
 import { AdminDashboard } from './components/AdminDashboard';
+import { AboutCard } from './components/AboutCard';
 import { clsx } from 'clsx';
 
 function App() {
@@ -136,7 +137,7 @@ function App() {
             )}
 
             {/* Results */}
-            {container && (
+            {container ? (
               <div className="space-y-6">
                 {/* Tabs */}
                 <div className="flex justify-center border-b border-slate-200">
@@ -180,7 +181,9 @@ function App() {
                   )}
                 </div>
               </div>
-            )}
+            ) :
+              <AboutCard />
+            }
           </>
         )}
       </div>
