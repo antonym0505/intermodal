@@ -63,4 +63,40 @@ export const api = {
         });
         return response.data;
     },
+
+    registerContainer: async (
+        unitNumber: string,
+        ownerCode: string,
+        isoType: string,
+        tareWeight: number,
+        maxGrossWeight: number,
+        ownerAddress: string
+    ) => {
+        const response = await axios.post(`${API_URL}/containers`, {
+            unitNumber,
+            ownerCode,
+            isoType,
+            tareWeight,
+            maxGrossWeight,
+            ownerAddress
+        });
+        return response.data;
+    },
+
+    registerFacility: async (
+        facilityAddress: string,
+        facilityCode: string,
+        facilityType: number,
+        name: string,
+        location: string
+    ) => {
+        const response = await axios.post(`${API_URL}/facilities`, {
+            facilityAddress,
+            facilityCode,
+            facilityType,
+            name,
+            location
+        });
+        return response.data;
+    }
 };

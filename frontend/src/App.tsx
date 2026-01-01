@@ -3,6 +3,7 @@ import { Search, Loader2 } from 'lucide-react';
 import { api, type Container, type HandoffStatus } from './api';
 import { ContainerCard } from './components/ContainerCard';
 import { HandoffStatusCard } from './components/HandoffStatusCard';
+import { AdminDashboard } from './components/AdminDashboard';
 import { clsx } from 'clsx';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'container' | 'handoff'>('container');
+  const [showAdmin, setShowAdmin] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,90 +77,105 @@ function App() {
 
         {/* Header */}
         <header className="text-center space-y-2">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
-            Intermodal<span className="text-blue-600">Trace</span>
-          </h1>
+          <div className="flex items-center justify-center gap-4 relative">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
+              Intermodal<span className="text-blue-600">Trace</span>
+            </h1>
+            <button
+              onClick={() => setShowAdmin(!showAdmin)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400 hover:text-slate-600 border border-slate-200 rounded px-2 py-1"
+            >
+              {showAdmin ? 'Close Admin' : 'Admin'}
+            </button>
+          </div>
           <p className="text-slate-500">Decentralized Container Custody Tracking</p>
         </header>
 
-        {/* Search */}
-        <div className="bg-white p-2 rounded-xl shadow-lg shadow-slate-200/50 max-w-lg mx-auto border border-slate-100">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Enter Unit Number (e.g. MSCU1234567)"
-                className="w-full pl-10 pr-4 py-3 rounded-lg bg-transparent outline-none text-slate-800 placeholder:text-slate-400 font-mono"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Track'}
-            </button>
-          </form>
-        </div>
+        {showAdmin ? (
+          <AdminDashboard />
+        ) : (
+          <>
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-center">
-            {error}
-          </div>
-        )}
-
-        {/* Results */}
-        {container && (
-          <div className="space-y-6">
-            {/* Tabs */}
-            <div className="flex justify-center border-b border-slate-200">
-              <button
-                onClick={() => setActiveTab('container')}
-                className={clsx(
-                  "px-6 py-3 text-sm font-medium border-b-2 transition-colors",
-                  activeTab === 'container'
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-slate-500 hover:text-slate-700"
-                )}
-              >
-                Container Details
-              </button>
-              <button
-                onClick={() => setActiveTab('handoff')}
-                className={clsx(
-                  "px-6 py-3 text-sm font-medium border-b-2 transition-colors",
-                  activeTab === 'handoff'
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-slate-500 hover:text-slate-700"
-                )}
-              >
-                Custody & Handoffs
-              </button>
-            </div>
-
-            <div className="max-w-2xl mx-auto">
-              {activeTab === 'container' ? (
-                <ContainerCard container={container} />
-              ) : (
-                <div className="space-y-4">
-                  <ContainerCard container={container} className="opacity-75 blur-[0.5px] scale-95 origin-top" />
-                  <div className="-mt-12 relative z-10">
-                    <HandoffStatusCard
-                      status={handoffStatus || { hasPendingHandoff: false }}
-                      onConfirm={handleConfirmHandoff}
-                    />
-                  </div>
+            {/* Search */}
+            <div className="bg-white p-2 rounded-xl shadow-lg shadow-slate-200/50 max-w-lg mx-auto border border-slate-100">
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Enter Unit Number (e.g. MSCU1234567)"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-transparent outline-none text-slate-800 placeholder:text-slate-400 font-mono"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-              )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Track'}
+                </button>
+              </form>
             </div>
-          </div>
+
+            {/* Error */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-center">
+                {error}
+              </div>
+            )}
+
+            {/* Results */}
+            {container && (
+              <div className="space-y-6">
+                {/* Tabs */}
+                <div className="flex justify-center border-b border-slate-200">
+                  <button
+                    onClick={() => setActiveTab('container')}
+                    className={clsx(
+                      "px-6 py-3 text-sm font-medium border-b-2 transition-colors",
+                      activeTab === 'container'
+                        ? "border-blue-600 text-blue-600"
+                        : "border-transparent text-slate-500 hover:text-slate-700"
+                    )}
+                  >
+                    Container Details
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('handoff')}
+                    className={clsx(
+                      "px-6 py-3 text-sm font-medium border-b-2 transition-colors",
+                      activeTab === 'handoff'
+                        ? "border-blue-600 text-blue-600"
+                        : "border-transparent text-slate-500 hover:text-slate-700"
+                    )}
+                  >
+                    Custody & Handoffs
+                  </button>
+                </div>
+
+                <div className="max-w-2xl mx-auto">
+                  {activeTab === 'container' ? (
+                    <ContainerCard container={container} />
+                  ) : (
+                    <div className="space-y-4">
+                      <ContainerCard container={container} className="opacity-75 blur-[0.5px] scale-95 origin-top" />
+                      <div className="-mt-12 relative z-10">
+                        <HandoffStatusCard
+                          status={handoffStatus || { hasPendingHandoff: false }}
+                          onConfirm={handleConfirmHandoff}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 
