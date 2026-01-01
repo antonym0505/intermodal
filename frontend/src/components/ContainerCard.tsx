@@ -1,13 +1,14 @@
-import { type Container } from '../api';
-import { Box, Truck, Scale, Calendar, User } from 'lucide-react';
+import { type Container, type CustodyEvent } from '../api';
+import { Box, Truck, Scale, Calendar, User, History as HistoryIcon, CheckCircle2, Clock } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
 interface ContainerCardProps {
     container: Container;
+    history?: CustodyEvent[];
     className?: string;
 }
 
-export function ContainerCard({ container, className }: ContainerCardProps) {
+export function ContainerCard({ container, className, history }: ContainerCardProps) {
     return (
         <div className={twMerge("bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden", className)}>
             <div className="bg-slate-50 border-b border-slate-100 p-4 flex justify-between items-center">
@@ -74,6 +75,66 @@ export function ContainerCard({ container, className }: ContainerCardProps) {
                     </div>
                 </div>
             </div>
+
+            {history && history.length > 0 && (
+                <div className="border-t border-slate-100 p-4 bg-slate-50/50">
+                    <div className="flex items-center gap-2 mb-4">
+                        <HistoryIcon className="w-4 h-4 text-slate-500" />
+                        <h4 className="font-semibold text-slate-700 text-sm">Custody History</h4>
+                    </div>
+
+                    <div className="relative pl-4 border-l-2 border-slate-200 space-y-6">
+                        {history.map((event) => (
+                            <div key={event.id} className="relative">
+                                {/* Dot */}
+                                <div className={twMerge(
+                                    "absolute -left-[21px] top-1 w-3 h-3 rounded-full border-2 bg-white",
+                                    event.status === 'CONFIRMED' || event.status === 'CONFIRMED_EVENT' ? "border-green-500" : "border-amber-400"
+                                )} />
+
+                                <div className="space-y-1">
+                                    <div className="flex items-start justify-between">
+                                        <p className="font-medium text-sm text-slate-900">
+                                            {event.from.slice(0, 6)}...{event.from.slice(-4)}
+                                            <span className="text-slate-400 mx-2">→</span>
+                                            {event.to.slice(0, 6)}...{event.to.slice(-4)}
+                                        </p>
+                                        <span className={twMerge(
+                                            "text-[10px] font-bold px-1.5 py-0.5 rounded uppercase",
+                                            event.status === 'CONFIRMED' || event.status === 'CONFIRMED_EVENT'
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-amber-100 text-amber-700"
+                                        )}>
+                                            {event.status === 'CONFIRMED_EVENT' ? 'CONFIRMED' : event.status}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                                        <span className="flex items-center gap-1">
+                                            <Clock className="w-3 h-3" />
+                                            {new Date(Number(event.initiatedAt) * 1000).toLocaleDateString()}
+                                        </span>
+                                        {event.confirmedAt && (
+                                            <span className="flex items-center gap-1 text-green-600">
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                Confirmed
+                                            </span>
+                                        )}
+                                        <a
+                                            href={`https://sepolia.basescan.org/tx/${event.txHash}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            Tx
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

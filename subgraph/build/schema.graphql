@@ -1,0 +1,31 @@
+type Container @entity {
+  id: ID!                    # tokenId
+  unitNumber: String!
+  isoType: String!
+  ownerCode: String!
+  owner: Bytes!              # Legal owner wallet
+  currentPossessor: Bytes    # Current custody holder
+  possessionExpires: BigInt
+  registeredAt: BigInt!
+  handoffs: [Handoff!]! @derivedFrom(field: "container")
+}
+
+type Handoff @entity {
+  id: ID!
+  container: Container!
+  from: Bytes!
+  to: Bytes!
+  initiatedAt: BigInt!
+  confirmedAt: BigInt
+  expires: BigInt
+  status: String!            # PENDING, CONFIRMED, EXPIRED
+  txHash: Bytes!
+}
+
+type Facility @entity {
+  id: ID!                    # Wallet Address
+  facilityCode: String!
+  name: String!
+  location: String
+  isActive: Boolean!
+}

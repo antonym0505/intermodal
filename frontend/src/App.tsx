@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Loader2 } from 'lucide-react';
-import { api, type Container, type HandoffStatus } from './api';
+import { api, type Container, type HandoffStatus, type CustodyEvent } from './api';
 import { ContainerCard } from './components/ContainerCard';
 import { HandoffStatusCard } from './components/HandoffStatusCard';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -10,6 +10,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [container, setContainer] = useState<Container | null>(null);
   const [handoffStatus, setHandoffStatus] = useState<HandoffStatus | null>(null);
+  const [history, setHistory] = useState<CustodyEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'container' | 'handoff'>('container');
@@ -40,6 +41,14 @@ function App() {
       if (handoffResult.status === 'fulfilled') {
         setHandoffStatus(handoffResult.value);
       }
+
+      // We need the Token ID for history lookup.
+      // If container call succeeded, use that.
+      if (containerResult.status === 'fulfilled' && containerResult.value) {
+        const events = await api.getContainerHistory(containerResult.value.tokenId);
+        setHistory(events);
+      }
+
     } catch (err: any) {
       setError(err.message || 'Failed to fetch container details');
     } finally {
@@ -157,7 +166,7 @@ function App() {
 
                 <div className="max-w-2xl mx-auto">
                   {activeTab === 'container' ? (
-                    <ContainerCard container={container} />
+                    <ContainerCard container={container} history={history} />
                   ) : (
                     <div className="space-y-4">
                       <ContainerCard container={container} className="opacity-75 blur-[0.5px] scale-95 origin-top" />

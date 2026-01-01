@@ -1,0 +1,31 @@
+specVersion: 1.0.0
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: IntermodalUnit
+    network: base-sepolia
+    source:
+      address: "0xA25bC78cE82d3Af3520F553dC3b1B6E92D28DB14"
+      abi: IntermodalUnit
+      startBlock: 19680000 
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Container
+        - Handoff
+      abis:
+        - name: IntermodalUnit
+          file: ../artifacts/contracts/IntermodalUnit.sol/IntermodalUnit.json
+      eventHandlers:
+        - event: ContainerRegistered(indexed uint256,string,string,indexed address)
+          handler: handleContainerRegistered
+        - event: PossessionTransferInitiated(indexed uint256,indexed address,indexed address,uint64)
+          handler: handlePossessionTransferInitiated
+        - event: PossessionConfirmed(indexed uint256,indexed address,uint256,string)
+          handler: handlePossessionConfirmed
+        - event: UpdateUser(indexed uint256,indexed address,uint64)
+          handler: handleUpdateUser
+      file: ./src/mappings/intermodal-unit.ts

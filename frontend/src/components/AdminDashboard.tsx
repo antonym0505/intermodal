@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { api } from '../api';
-import { Warehouse, Container, Plus, Loader2, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { api, type ContainerSummary } from '../api';
+import { Warehouse, Container, Plus, Loader2, CheckCircle2, RefreshCcw } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export function AdminDashboard() {
@@ -26,6 +26,20 @@ export function AdminDashboard() {
         maxWeight: '',
         ownerAddress: ''
     });
+
+    // Recent Containers State
+    const [recentContainers, setRecentContainers] = useState<ContainerSummary[]>([]);
+
+    const fetchRecentContainers = async () => {
+        const data = await api.getRecentContainers();
+        setRecentContainers(data);
+    };
+
+    useEffect(() => {
+        if (activeTab === 'container') {
+            fetchRecentContainers();
+        }
+    }, [activeTab]);
 
     const handleFacilitySubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -66,6 +80,7 @@ export function AdminDashboard() {
             );
             setMessage({ type: 'success', text: `Container ${containerForm.unitNumber} minted successfully!` });
             setContainerForm(prev => ({ ...prev, unitNumber: '', tareWeight: '', maxWeight: '' }));
+            fetchRecentContainers(); // Refresh list
         } catch (err: any) {
             setMessage({ type: 'error', text: err.response?.data?.message || err.message });
         } finally {
@@ -283,6 +298,38 @@ export function AdminDashboard() {
                             Mint Container
                         </button>
                     </form>
+                )}
+
+                {activeTab === 'container' && (
+                    <div className="mt-8 border-t border-slate-100 pt-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-semibold text-slate-700">Recent Implementations</h3>
+                            <button
+                                onClick={fetchRecentContainers}
+                                className="text-slate-400 hover:text-blue-600 transition-colors"
+                            >
+                                <RefreshCcw className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-2">
+                            {!recentContainers || recentContainers.length === 0 ? (
+                                <p className="text-sm text-slate-400 italic text-center py-4">No containers found on metadata index.</p>
+                            ) : (
+                                recentContainers.map(c => (
+                                    <div key={c.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm">
+                                        <div className="font-mono font-medium text-slate-900">{c.unitNumber}</div>
+                                        <div className="flex items-center gap-4 text-slate-500">
+                                            <span>{c.ownerCode}</span>
+                                            <span className="text-xs">
+                                                {new Date(Number(c.registeredAt) * 1000).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

@@ -15,6 +15,23 @@ export interface Container {
     possessionExpires: string;
 }
 
+export interface ContainerSummary {
+    id: string; // tokenId
+    unitNumber: string;
+    ownerCode: string;
+    registeredAt: string;
+}
+
+export interface CustodyEvent {
+    id: string;
+    from: string;
+    to: string;
+    initiatedAt: string;
+    confirmedAt: string | null;
+    status: string;
+    txHash: string;
+}
+
 export interface HandoffStatus {
     hasPendingHandoff: boolean;
     tokenId?: string;
@@ -98,5 +115,84 @@ export const api = {
             location
         });
         return response.data;
+    },
+
+    getContainerHistory: async (tokenId: string): Promise<CustodyEvent[]> => {
+        const query = `
+        query {
+            handoffs(
+                where: { container: "${tokenId}" }
+                orderBy: initiatedAt
+                orderDirection: desc
+            ) {
+                id
+                from
+                to
+                initiatedAt
+                confirmedAt
+                status
+                txHash
+            }
+        }`;
+
+        try {
+            const response = await fetch('https://api.studio.thegraph.com/query/1721903/intermodal-subgraph/v0.0.3', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query }),
+            });
+            const data = await response.json();
+
+            if (data.errors) {
+                console.error('Subgraph errors:', data.errors);
+                return [];
+            }
+
+            if (!data.data || !data.data.handoffs) {
+                console.error('Unexpected subgraph response:', data);
+                return [];
+            }
+
+            return data.data.handoffs;
+        } catch (error) {
+            console.error('Failed to fetch history:', error);
+            return [];
+        }
+    },
+
+    getRecentContainers: async (): Promise<ContainerSummary[]> => {
+        const query = `
+        query {
+            containers(first: 10, orderBy: registeredAt, orderDirection: desc) {
+                id
+                unitNumber
+                ownerCode
+                registeredAt
+            }
+        }`;
+
+        try {
+            const response = await fetch('https://api.studio.thegraph.com/query/1721903/intermodal-subgraph/v0.0.3', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query }),
+            });
+            const data = await response.json();
+
+            if (data.errors) {
+                console.error('Subgraph errors:', data.errors);
+                return [];
+            }
+
+            if (!data.data || !data.data.containers) {
+                console.error('Unexpected subgraph response:', data);
+                return [];
+            }
+
+            return data.data.containers;
+        } catch (error) {
+            console.error('Failed to fetch recent containers:', error);
+            return [];
+        }
     }
 };
