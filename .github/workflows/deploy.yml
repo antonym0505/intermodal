@@ -14,12 +14,6 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Set Backend Environment Variables
-        run: |
-          railway variables --set "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" --service backend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
       - name: Deploy Backend
         run: railway up --service backend --detach
         env:
@@ -27,5 +21,11 @@ jobs:
 
       - name: Deploy Frontend
         run: railway up --service frontend --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Set Backend Environment Variables
+        run: |
+          railway variables --set "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" --service backend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
