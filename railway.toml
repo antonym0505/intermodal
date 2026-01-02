@@ -4,7 +4,7 @@ builder = "nixpacks"
 [[services]]
 name = "backend"
 root = "backend"
-[services.deploy]
+# Deploy Config
 startCommand = "npm run start:prod"
 healthcheckPath = "/"
 healthcheckTimeout = 100
@@ -14,8 +14,7 @@ restartPolicyMaxRetries = 10
 [[services]]
 name = "frontend"
 root = "frontend"
-[services.build]
-builder = "nixpacks"
+# Build Config
 buildCommand = "npm run build"
-[services.deploy]
+# Deploy Config
 startCommand = "npm run preview -- --host --port $PORT"
