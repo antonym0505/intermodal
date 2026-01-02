@@ -16,7 +16,7 @@ jobs:
 
       - name: Set Backend Environment Variables
         run: |
-          railway variables set PRIVATE_KEY=${{ secrets.PRIVATE_KEY }} --service backend
+          railway variables --set "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" --service backend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
